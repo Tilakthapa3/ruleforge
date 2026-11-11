@@ -1,0 +1,34 @@
+RuleForge - research report
+Goal: catch SSH brute force with fewer false alarms
+Rounds: 3
+
+Round 1: INVALID RULE - detection.condition does not parse: 'selection | count() by src_ip over 5m >= 10' (score 0.0000)
+Round 2: SSH Brute Force - Failed Logins From One IP - train score 0.0000 (catch 0.0000, false-positive 0.0000)
+Round 3: SSH Brute Force - Failed Logins From One IP - train score 0.9375 (catch 0.9375, false-positive 0.0000)
+
+Best rule: SSH Brute Force - Failed Logins From One IP
+  proposed in round 3
+  level: medium
+  condition: selection | count() by src_ip >= 5
+  train score: 0.9375
+  test score: 0.9286 (catch rate 0.9286, false-positive rate 0.0000)
+  test counts: TP 13, FP 0, FN 1, TN 18
+  precision: 1.0000  recall: 0.9286  F1: 0.9630
+
+What it catches on the held-out test split: 13 of 14 attack lines (12 failed-password attempts, 1 failed-publickey probes).
+What it misses:
+  - Oct 31 03:11:03 server sshd[508]: Accepted password for deploy from 192.0.2.99 port 60107 ssh2
+False positives on the test split: none.
+
+Reviewer's verdict: VERDICT: good rule
+
+Suggestion: Consider increasing the threshold in the condition to `selection | count() by src_ip >= 10` to potentially reduce the risk of future false positives while maintaining a high catch rate.
+
+A human must approve before any rule goes live. This agent only proposes.
+
+Saved:
+  /Users/anitabudha/Documents/ruleforge/output/best_rule.json
+  /Users/anitabudha/Documents/ruleforge/output/best_rule.yml
+  /Users/anitabudha/Documents/ruleforge/output/reply_round_1.txt
+  /Users/anitabudha/Documents/ruleforge/output/reply_round_2.txt
+  /Users/anitabudha/Documents/ruleforge/output/reply_round_3.txt

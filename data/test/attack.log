@@ -1,0 +1,14 @@
+Oct 31 03:10:01 server sshd[501]: Failed password for invalid user admin from 192.0.2.99 port 60100 ssh2
+Oct 31 03:10:09 server sshd[502]: Failed password for root from 192.0.2.99 port 60101 ssh2
+Oct 31 03:10:18 server sshd[503]: Failed password for invalid user test from 192.0.2.99 port 60102 ssh2
+Oct 31 03:10:27 server sshd[504]: Failed password for invalid user ubuntu from 192.0.2.99 port 60103 ssh2
+Oct 31 03:10:35 server sshd[505]: Failed password for root from 192.0.2.99 port 60104 ssh2
+Oct 31 03:10:44 server sshd[506]: Failed password for invalid user oracle from 192.0.2.99 port 60105 ssh2
+Oct 31 03:10:52 server sshd[507]: Failed password for invalid user guest from 192.0.2.99 port 60106 ssh2
+Oct 31 03:11:03 server sshd[508]: Accepted password for deploy from 192.0.2.99 port 60107 ssh2
+Oct 31 04:22:14 server sshd[601]: Failed password for invalid user admin from 203.0.113.200 port 60200 ssh2
+Oct 31 04:22:23 server sshd[602]: Failed password for root from 203.0.113.200 port 60201 ssh2
+Oct 31 04:22:31 server sshd[603]: Failed password for invalid user mysql from 203.0.113.200 port 60202 ssh2
+Oct 31 04:22:40 server sshd[604]: Failed password for invalid user support from 203.0.113.200 port 60203 ssh2
+Oct 31 04:22:49 server sshd[605]: Failed password for root from 203.0.113.200 port 60204 ssh2
+Oct 31 04:22:57 server sshd[606]: Failed publickey for invalid user git from 203.0.113.200 port 60205 ssh2

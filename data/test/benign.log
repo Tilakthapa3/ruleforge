@@ -1,0 +1,18 @@
+Oct 31 08:05:11 server sshd[701]: Accepted password for alice from 10.0.0.5 port 61100 ssh2
+Oct 31 08:19:33 server sshd[702]: Accepted publickey for bob from 10.0.0.12 port 61101 ssh2
+Oct 31 08:47:02 server sshd[703]: Failed password for dave from 192.0.2.20 port 61102 ssh2
+Oct 31 08:47:14 server sshd[704]: Accepted password for dave from 192.0.2.20 port 61103 ssh2
+Oct 31 09:12:45 server sshd[705]: Accepted password for carol from 192.168.1.20 port 61104 ssh2
+Oct 31 09:38:26 server sshd[706]: Accepted publickey for erin from 10.0.0.21 port 61105 ssh2
+Oct 31 10:04:58 server sshd[707]: Accepted password for deploy from 10.0.0.21 port 61106 ssh2
+Oct 31 10:29:17 server sshd[708]: Failed password for erin from 192.0.2.21 port 61107 ssh2
+Oct 31 10:29:26 server sshd[709]: Accepted password for erin from 192.0.2.21 port 61108 ssh2
+Oct 31 11:15:40 server sshd[710]: Accepted publickey for frank from 192.168.1.21 port 61109 ssh2
+Oct 31 11:41:03 server sshd[711]: Failed password for bob from 192.0.2.22 port 61110 ssh2
+Oct 31 12:08:29 server sshd[712]: Accepted password for git from 192.168.1.20 port 61111 ssh2
+Oct 31 12:33:54 server sshd[713]: Disconnected from authenticating user root 198.51.100.150 port 61112 [preauth]
+Oct 31 13:02:11 server CRON[800]: (root) CMD (run-parts /etc/cron.hourly)
+Oct 31 13:26:48 server sshd[714]: Accepted publickey for alice from 10.0.0.5 port 61113 ssh2
+Oct 31 14:14:02 server sshd[715]: Accepted password for bob from 10.0.0.12 port 61114 ssh2
+Oct 31 14:52:37 server sshd[716]: Accepted password for carol from 192.168.1.21 port 61115 ssh2
+Oct 31 15:30:19 server sshd[717]: Accepted publickey for dave from 10.0.0.5 port 61116 ssh2

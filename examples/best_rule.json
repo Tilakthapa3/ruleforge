@@ -1,0 +1,19 @@
+{
+  "title": "SSH Brute Force - Failed Logins From One IP",
+  "logsource": {
+    "category": "auth",
+    "product": "linux",
+    "service": "sshd"
+  },
+  "detection": {
+    "selection": {
+      "message": [
+        "Failed password",
+        "Failed publickey"
+      ]
+    },
+    "condition": "selection | count() by src_ip >= 5"
+  },
+  "level": "medium",
+  "description": "Detects potential SSH brute force attacks by identifying multiple failed login attempts from a single IP address."
+}
