@@ -22,7 +22,7 @@ False positives on the test split: none.
 
 Reviewer's verdict: VERDICT: good rule
 
-Suggestion: Consider increasing the threshold in the condition to `selection | count() by src_ip >= 10` to potentially reduce the risk of future false positives while maintaining a high catch rate.
+Suggestion: Consider increasing the threshold in the condition to `selection | count() by src_ip >= 10` to potentially reduce the risk of future false positives while maintaining a high catch rate. (Note: >= 10 was tried in round 2 and scored 0.0000 — it catches nothing on these logs, so the threshold stays at 5.)
 
 A human must approve before any rule goes live. This agent only proposes.
 
