@@ -232,6 +232,68 @@ def format_report(report):
     return "\n".join(lines)
 
 
+def save_report(report, output_dir):
+    """Write the plain-text report inside the workspace.
+
+    Step 3: the report used to be printed to stdout only, so a run's
+    reasoning vanished once the terminal scrolled. It is now always
+    saved as report.txt next to best_rule.json/yml.
+    Returns the written path.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    report_path = os.path.join(output_dir, "report.txt")
+    with open(report_path, "w", encoding="utf-8") as handle:
+        handle.write(format_report(report) + "\n")
+    return report_path
+
+
+def save_to_repo(report, repo_dir):
+    """Write the best rule + report into a repo's sigma/ folder.
+
+    Step 3, save-to-repo option. Only runs when the user passes
+    --save-to-repo on the command line -- never by default, and a
+    human must still approve before any rule goes live (the files
+    are proposed rules in a repo folder, not a deployment).
+
+    Writes <repo_dir>/sigma/ruleforge-ssh-brute-force.yml and
+    <repo_dir>/sigma/ruleforge-report.txt. Refuses to overwrite an
+    existing file, so a previous RuleForge save can never be
+    silently replaced; delete or rename it first if you mean to
+    replace it. Raises FileNotFoundError when repo_dir is not a
+    directory, FileExistsError when a target file already exists,
+    and returns [] when no valid rule was proposed.
+    """
+    if report["best"] is None:
+        return []
+    if not os.path.isdir(repo_dir):
+        raise FileNotFoundError(
+            "save-to-repo target is not a directory: {0}".format(repo_dir))
+    sigma_dir = os.path.join(repo_dir, "sigma")
+    os.makedirs(sigma_dir, exist_ok=True)
+    rule = report["best"]["rule"]
+    test_result = report["test_result"]
+    header = (
+        "# RuleForge proposal - NOT live until a human approves it.\n"
+        "# Goal: {0}\n"
+        "# Held-out test score: {1:.4f} (TP {2}, FP {3}, FN {4}, "
+        "TN {5}); see ruleforge-report.txt in this folder.\n"
+        "# Honest limit: the count is per log file, not per time\n"
+        "# window, unlike CyberBeep's 5-in-300-seconds rule.\n".format(
+            report["goal"], test_result["score"], test_result["tp"],
+            test_result["fp"], test_result["fn"], test_result["tn"]))
+    yaml_path = os.path.join(sigma_dir, "ruleforge-ssh-brute-force.yml")
+    report_path = os.path.join(sigma_dir, "ruleforge-report.txt")
+    for path in (yaml_path, report_path):
+        if os.path.exists(path):
+            raise FileExistsError(
+                "refusing to overwrite existing file: {0}".format(path))
+    with open(yaml_path, "w", encoding="utf-8") as handle:
+        handle.write(header + rules.emit_yaml(rule))
+    with open(report_path, "w", encoding="utf-8") as handle:
+        handle.write(format_report(report) + "\n")
+    return [yaml_path, report_path]
+
+
 def save_best_rule(report, output_dir):
     """Write the best rule as JSON and YAML inside the workspace.
 
@@ -283,6 +345,10 @@ def main(argv=None):
     parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR,
                         help="where to write the best rule "
                              "(default: output/)")
+    parser.add_argument("--save-to-repo", default=None, metavar="DIR",
+                        help="also write the best rule + report into "
+                             "DIR/sigma/ (step 3, only when given; "
+                             "refuses to overwrite existing files)")
     args = parser.parse_args(argv)
     if args.rounds < 1 or args.rounds > 5:
         parser.error("--rounds must be between 1 and 5")
@@ -301,7 +367,14 @@ def main(argv=None):
         return 2
     print(format_report(report))
     saved = save_best_rule(report, args.output_dir)
+    saved = saved + [save_report(report, args.output_dir)]
     saved = saved + save_replies(report, args.output_dir)
+    if args.save_to_repo is not None:
+        try:
+            saved = saved + save_to_repo(report, args.save_to_repo)
+        except (FileNotFoundError, FileExistsError) as exc:
+            print("error: {0}".format(exc), file=sys.stderr)
+            return 2
     if saved:
         print("")
         print("Saved:")

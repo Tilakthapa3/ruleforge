@@ -49,10 +49,13 @@ Options:
 - `--rounds N` (default 3, max 5)
 - `--data-dir data` (labeled logs)
 - `--output-dir output` (where the best rule is written)
+- `--save-to-repo DIR` (step 3, optional: also write the best rule
+  and report into `DIR/sigma/`; never by default, refuses to
+  overwrite existing files)
 
 Exit code is 0 on a completed run, 2 on missing data or bad
 arguments. The best rule is saved as `output/best_rule.json` and
-`output/best_rule.yml`.
+`output/best_rule.yml`, and the report as `output/report.txt`.
 
 Run the tests:
 
@@ -76,7 +79,7 @@ python3 -m unittest discover -s tests -v
   truth in `GROUND_TRUTH.md`
 - `examples/` — the best rule and full report from the live run
   (step 2), as JSON, YAML, and plain text
-- `tests/` — stdlib unittest (57 tests)
+- `tests/` — stdlib unittest (61 tests)
 
 ## What a rule looks like
 
@@ -138,8 +141,17 @@ CyberBeep sample (`data-real/`) it scores 0.8571 (TP 6 / FP 0 /
 FN 1 / TN 4); the only miss is the accepted login after the burst —
 a separate login-after-brute-force rule's job.
 
-**Step 3 (not built yet):** report output plus a save-to-repo option
-— write the best rule into the CyberBeep repo, on your say-so only.
+**Step 3 (built 2026-11-11, not published yet):** report output plus
+a save-to-repo option. Every run now saves `output/report.txt`
+next to the best rule, and `--save-to-repo <repo-dir>` also writes
+`sigma/ruleforge-ssh-brute-force.yml` + `sigma/ruleforge-report.txt`
+into that repo — only when the flag is given, never by default, and
+it refuses to overwrite an existing file. The saved rule is a
+proposal, not live: a human must still approve before it goes
+anywhere, and the YAML header says so, with its test score and the
+per-log-file (not per-time-window) limit stated plainly. Verified
+with 61 tests (4 new step-3 tests) and a mock end-to-end run into a
+test repo.
 
 **Future (not built):** the real `sigma check` call plugged in
 behind `validate_rule` (structural validation stays as the fast

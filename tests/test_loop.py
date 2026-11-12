@@ -201,6 +201,98 @@ class CliTests(unittest.TestCase):
                 with open(path, "r", encoding="utf-8") as handle:
                     self.assertIn("```json", handle.read())
 
+    def test_report_is_saved_to_output_dir(self):
+        # Step 3: the report used to exist only on stdout.
+        with tempfile.TemporaryDirectory() as tmp:
+            out = io.StringIO()
+            with redirect_stdout(out):
+                code = ruleforge.main([
+                    "--goal", "catch SSH brute force",
+                    "--output-dir", tmp,
+                ])
+            self.assertEqual(code, 0)
+            report_path = os.path.join(tmp, "report.txt")
+            self.assertTrue(os.path.exists(report_path))
+            with open(report_path, "r", encoding="utf-8") as handle:
+                saved = handle.read()
+            self.assertIn("test score: 0.9286", saved)
+            self.assertIn("A human must approve", saved)
+
+    def test_save_to_repo_writes_sigma_files(self):
+        # Step 3: --save-to-repo writes the rule + report under
+        # the target repo's sigma/ folder, and nothing without it.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = os.path.join(tmp, "repo")
+            out_dir = os.path.join(tmp, "out")
+            os.makedirs(repo)
+            out = io.StringIO()
+            with redirect_stdout(out):
+                code = ruleforge.main([
+                    "--goal", "catch SSH brute force",
+                    "--output-dir", out_dir,
+                    "--save-to-repo", repo,
+                ])
+            self.assertEqual(code, 0)
+            yaml_path = os.path.join(
+                repo, "sigma", "ruleforge-ssh-brute-force.yml")
+            report_path = os.path.join(
+                repo, "sigma", "ruleforge-report.txt")
+            self.assertTrue(os.path.exists(yaml_path))
+            self.assertTrue(os.path.exists(report_path))
+            with open(yaml_path, "r", encoding="utf-8") as handle:
+                yaml_text = handle.read()
+            self.assertIn("count() by src_ip >= 5", yaml_text)
+            self.assertIn("NOT live until a human approves", yaml_text)
+            self.assertIn("per log file, not per time", yaml_text)
+            with open(report_path, "r", encoding="utf-8") as handle:
+                self.assertIn("test score: 0.9286", handle.read())
+            # Without the flag, no sigma/ folder is created.
+            out2 = io.StringIO()
+            with redirect_stdout(out2):
+                code2 = ruleforge.main([
+                    "--goal", "catch SSH brute force",
+                    "--output-dir", os.path.join(tmp, "out2"),
+                ])
+            self.assertEqual(code2, 0)
+            self.assertFalse(os.path.exists(
+                os.path.join(tmp, "out2", "sigma")))
+
+    def test_save_to_repo_refuses_to_overwrite(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = os.path.join(tmp, "repo")
+            os.makedirs(repo)
+            out = io.StringIO()
+            with redirect_stdout(out):
+                code = ruleforge.main([
+                    "--goal", "catch SSH brute force",
+                    "--output-dir", os.path.join(tmp, "out"),
+                    "--save-to-repo", repo,
+                ])
+            self.assertEqual(code, 0)
+            yaml_path = os.path.join(
+                repo, "sigma", "ruleforge-ssh-brute-force.yml")
+            with open(yaml_path, "r", encoding="utf-8") as handle:
+                before = handle.read()
+            out2 = io.StringIO()
+            with redirect_stdout(out2):
+                code2 = ruleforge.main([
+                    "--goal", "catch SSH brute force",
+                    "--output-dir", os.path.join(tmp, "out2"),
+                    "--save-to-repo", repo,
+                ])
+            self.assertEqual(code2, 2)
+            with open(yaml_path, "r", encoding="utf-8") as handle:
+                self.assertEqual(before, handle.read())
+
+    def test_save_to_repo_missing_dir_exits_two(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code = ruleforge.main([
+                "--goal", "catch SSH brute force",
+                "--output-dir", os.path.join(tmp, "out"),
+                "--save-to-repo", os.path.join(tmp, "no-such-repo"),
+            ])
+        self.assertEqual(code, 2)
+
     def test_missing_data_dir_exits_two(self):
         with tempfile.TemporaryDirectory() as tmp:
             code = ruleforge.main(["--goal", "x", "--data-dir", tmp])
