@@ -141,7 +141,7 @@ CyberBeep sample (`data-real/`) it scores 0.8571 (TP 6 / FP 0 /
 FN 1 / TN 4); the only miss is the accepted login after the burst —
 a separate login-after-brute-force rule's job.
 
-**Step 3 (built 2026-11-11, not published yet):** report output plus
+**Step 3 (built and published 2026-11-11):** report output plus
 a save-to-repo option. Every run now saves `output/report.txt`
 next to the best rule, and `--save-to-repo <repo-dir>` also writes
 `sigma/ruleforge-ssh-brute-force.yml` + `sigma/ruleforge-report.txt`
